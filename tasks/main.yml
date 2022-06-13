@@ -12,11 +12,28 @@
 
 - name: Ensure chezmoi installed and initialized
   block:
+    - name: Check chezmoi install stat
+      ansible.builtin.stat:
+        path: "{{ chezmoi_bin }}"
+      register: _chezmoi_bin
+
+    - name: Download chezmoi install scripts
+      ansible.builtin.get_url:
+        url: https://chezmoi.io/get
+        dest: /tmp/chezmoi-install.sh
+        mode: "775"
+      when: not _chezmoi_bin.stat.exists
+
     - name: Execute chezmoi scripts
-      ansible.builtin.shell:
-        cmd: sh -c "$(curl -fsLS chezmoi.io/get)"
+      ansible.builtin.command:
+        cmd: /tmp/chezmoi-install.sh -d
         creates: "{{ chezmoi_bin }}"
         chdir: "{{ chezmoi_user_home }}"
+      register: stat
+      retries: 5
+      delay: 3
+      until: stat.rc == 0
+      when: not _chezmoi_bin.stat.exists
 
     - name: Check existing chezmoi dotfiles
       ansible.builtin.stat:
