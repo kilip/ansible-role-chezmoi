@@ -1,5 +1,40 @@
 ---
 - name: Converge
   hosts: all
+  vars:
+    chezmoi_user: "testing"
+    chezmoi_repo: "/tmp/chezmoi.git"
+  pre_tasks:
+    - name: Ensure chezmoi user group exists
+      ansible.builtin.group:
+        name: "{{ chezmoi_user }}"
+        state: present
+
+    - name: Ensure chezmoi user exists
+      ansible.builtin.user:
+        name: "{{ chezmoi_user }}"
+        group: "{{ chezmoi_user }}"
+        state: "present"
+
+    - name: Ensure debian cache updated
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 600
+
+    - name: Ensure git package installed
+      ansible.builtin.package:
+        name:
+          - git
+          - curl
+        state: present
+
+    - name: Ensure test repo copied
+      ansible.builtin.unarchive:
+        src: dotfiles.tgz
+        dest: "/tmp"
+        owner: "{{ chezmoi_user }}"
+        group: "{{ chezmoi_user }}"
+        mode: "0755"
+
   roles:
     - role: "kilip.chezmoi"
