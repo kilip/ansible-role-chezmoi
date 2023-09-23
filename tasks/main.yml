@@ -1,7 +1,7 @@
 ---
 - name: Ensure chezmoi repo configured
   ansible.builtin.set_fact:
-    chezmoi_install_args: " -- init {{ chezmoi_repo }}"
+    chezmoi_install_args: " -- init --apply {{ chezmoi_repo }}"
   when: chezmoi_repo != ""
 
 - name: Ensure install scripts downloaded
