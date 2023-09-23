@@ -1,2 +1,10 @@
 ---
-# tasks file for chezmoi
+- name: Ensure cache updated
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 600
+
+- name: Ensure chezmoi package installed
+  ansible.builtin.package:
+    name: chezmoi
+    state: present
