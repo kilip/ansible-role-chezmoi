@@ -1,10 +1,21 @@
 ---
-- name: Ensure cache updated
-  ansible.builtin.apt:
-    update_cache: true
-    cache_valid_time: 600
+- name: Ensure chezmoi repo configured
+  ansible.builtin.set_fact:
+    chezmoi_install_args: " -- init {{ chezmoi_repo }}"
+  when: chezmoi_repo != ""
 
-- name: Ensure chezmoi package installed
-  ansible.builtin.package:
-    name: chezmoi
-    state: present
+- name: Ensure install scripts downloaded
+  ansible.builtin.get_url:
+    url: "https://get.chezmoi.io"
+    dest: "/tmp/chezmoi.sh"
+    mode: "0777"
+    owner: "{{ chezmoi_user }}"
+    group: "{{ chezmoi_user_group }}"
+
+- name: Ensure chezmoi installed
+  ansible.builtin.command:
+    cmd: "/tmp/chezmoi.sh{{ chezmoi_install_args }}"
+    chdir: "{{ chezmoi_user_home }}"
+    creates: "{{ chezmoi_source_dir  }}"
+  become_user: "{{ chezmoi_user }}"
+  become: true

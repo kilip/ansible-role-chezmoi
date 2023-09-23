@@ -1,2 +1,8 @@
 ---
-# defaults file for chezmoi
+chezmoi_user: ""
+chezmoi_user_group: "{{ chezmoi_user }}"
+chezmoi_user_home: "/home/{{ chezmoi_user }}"
+chezmoi_source_dir: "{{ chezmoi_user_home }}/.local/share/chezmoi"
+chezmoi_repo: ""
+chezmoi_install_commands: 'sh -c "$(curl -fsLS get.chezmoi.io)"'
+chezmoi_install_args: " -- init"
